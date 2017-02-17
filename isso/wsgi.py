@@ -1,21 +1,22 @@
 # -*- encoding: utf-8 -*-
 
-from __future__ import unicode_literals
-
 import sys
 import socket
 
 try:
+    # Python 3.x
     from urllib.parse import quote, urlparse
 
     from socketserver import ThreadingMixIn
     from http.server import HTTPServer
 except ImportError:
+    # Python 2.x
     from urllib import quote
     from urlparse import urlparse
 
     from SocketServer import ThreadingMixIn
     from BaseHTTPServer import HTTPServer
+    from __future__ import unicode_literals
 
 from werkzeug.serving import WSGIRequestHandler
 from werkzeug.wrappers import Request as _Request

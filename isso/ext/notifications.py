@@ -2,13 +2,15 @@
 
 from __future__ import unicode_literals
 
-import sys
 import io
+import sys
+import cgi
 import time
 import json
 
 import socket
 import smtplib
+import requests
 
 from email.utils import formatdate
 from email.header import Header
@@ -159,7 +161,6 @@ class Stdout(object):
         pass
 
     def __iter__(self):
-
         yield "comments.new:new-thread", self._new_thread
         yield "comments.new:finish", self._new_comment
         yield "comments.edit", self._edit_comment
@@ -180,3 +181,78 @@ class Stdout(object):
 
     def _activate_comment(self, id):
         logger.info("comment %s activated" % id)
+
+class MailGun(object):
+
+    def __init__(self, isso):
+        self.isso = isso
+        self.conf = isso.conf.section("mailgun")
+        self.comments = isso.db.comments
+
+    def __iter__(self):
+        yield "comments.new:after-save", self.notify
+
+    def _sendmail(self, thread, comment, parent):
+        # Build message.
+        data={"from": "Comments <comment@jixun.moe>",
+              "subject": thread['title'],
+              "text": "",
+              "html": "",
+              "o:tag": ["New Comment", "newcomment"]}
+
+        if parent and parent['email'] != self.conf.monitor:
+            data['to'] = parent['email']
+            data['bcc'] = self.conf.monitor
+        else:
+            data['to'] = self.conf.monitor
+
+        # Generate text and html version of the email.
+        author = comment["author"] or "Anonymous"
+        url = comment["website"] or ""
+        comment_url = (local("origin") + thread["uri"] + "#isso-%i" % comment["id"])
+        text = '''
+%s%s wrote:
+
+%s
+
+View the comment at: %s<%s>
+'''.strip() % (author, ("<%s>" % url) if url else "", comment['text'], thread['title'], comment_url)
+
+        html = '''
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "EmailMessage",
+  "potentialAction": {
+    "@type": "ViewAction",
+    "target": %s,
+    "name": %s
+  },
+  "description": %s
+}
+</script>
+
+<a href="%s" target="_blank">%s</a> have wrote:
+
+<blockquote>%s</blockquote>
+
+View the comment at: <a href="%s" target="_blank">%s</a>
+'''.strip() % (
+    json.dumps(comment_url), json.dumps("View Comment"), json.dumps('View new comment at "%s"' % thread['title']), 
+    url, author, self.isso.render(comment['text']), comment_url, cgi.escape(thread['title']))
+
+    (data['text'], data['html']) = (text, html)
+    requests.post(
+        'https://api.mailgun.net/v3/%s/messages' % self.conf.domain,
+        auth=('api', self.conf.api_key),
+        data=data)
+
+    def notify(self, thread, comment):
+        parent = None
+        if comment['parent']:
+            parent = self.comments.get(comment['parent'])
+
+        self._sendmail(self, thread, comment, parent)
+
+
+
