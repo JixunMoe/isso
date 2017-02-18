@@ -216,8 +216,13 @@ class MailGun(object):
 %s
 
 View the comment at: %s<%s>
-'''.strip() % (author, ("<%s>" % url) if url else "", comment['text'], thread['title'], comment_url)
+'''.strip() % (
+            author, ("<%s>" % url) if url else "",
+            comment['text'],
+            thread['title'],
+            comment_url)
 
+        # ...
         html = '''
 <script type="application/ld+json">
 {
@@ -238,14 +243,21 @@ View the comment at: %s<%s>
 
 View the comment at: <a href="%s" target="_blank">%s</a>
 '''.strip() % (
-    json.dumps(comment_url), json.dumps("View Comment"), json.dumps('View new comment at "%s"' % thread['title']), 
-    url, author, self.isso.render(comment['text']), comment_url, cgi.escape(thread['title']))
+            json.dumps(comment_url),
+            json.dumps("View Comment"),
+            json.dumps('View new comment at "%s"' % thread['title']), 
+            url,
+            author,
+            self.isso.render(comment['text']),
+            comment_url,
+            cgi.escape(thread['title']))
+        # ...
 
-    (data['text'], data['html']) = (text, html)
-    requests.post(
-        'https://api.mailgun.net/v3/%s/messages' % self.conf.domain,
-        auth=('api', self.conf.api_key),
-        data=data)
+        (data['text'], data['html']) = (text, html)
+        requests.post(
+            'https://api.mailgun.net/v3/%s/messages' % self.conf.domain,
+            auth=('api', self.conf.api_key),
+            data=data)
 
     def notify(self, thread, comment):
         parent = None
