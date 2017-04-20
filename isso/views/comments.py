@@ -90,7 +90,7 @@ class API(object):
         ('like',    ('POST', '/id/<int:id>/like')),
         ('dislike', ('POST', '/id/<int:id>/dislike')),
         ('demo',    ('GET', '/demo')),
-        ('latest'   ('GET', '/latest')),
+        ('latest',  ('GET', '/latest')),
         ('preview', ('POST', '/preview'))
     ]
 
