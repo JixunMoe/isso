@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-
+from __future__ import unicode_literals
 import sys
 import socket
 
@@ -16,7 +16,6 @@ except ImportError:
 
     from SocketServer import ThreadingMixIn
     from BaseHTTPServer import HTTPServer
-    from __future__ import unicode_literals
 
 from werkzeug.serving import WSGIRequestHandler
 from werkzeug.wrappers import Request as _Request
