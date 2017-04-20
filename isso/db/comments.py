@@ -230,10 +230,7 @@ class Comments:
 
     def latest(self, count):
         sql = ['SELECT',
-                   'threads.uri,',
-                   'comments.author,',
-                   'comments.website,',
-                   'comments.text,',
+                   'threads.uri, comments.author, comments.website, comments.text',
                'FROM comments',
                'INNER JOIN threads ON comments.tid = threads.id',
                'ORDER BY comments.id DESC LIMIT ?']
