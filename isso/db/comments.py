@@ -228,6 +228,18 @@ class Comments:
 
         return [threads.get(url, 0) for url in urls]
 
+    def latest(self, count):
+        sql = ['SELECT',
+                   'threads.uri,',
+                   'comments.author,',
+                   'comments.website,',
+                   'comments.text,',
+               'FROM comments',
+               'INNER JOIN threads ON comments.tid = threads.id',
+               'ORDER BY comments.id DESC LIMIT ?']
+
+        return dict(self.db.execute(sql, [count]).fetchall())
+
     def purge(self, delta):
         """
         Remove comments older than :param:`delta`.
