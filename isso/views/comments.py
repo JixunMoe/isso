@@ -493,7 +493,7 @@ class API(object):
         return redirect(get_current_url(env) + '/index.html')
     
     def latest(self, env, req):
-        rv = self.comments.latest(5)
-        for c in rv:
+        comments = self.comments.latest(5)
+        for c in comments:
             c["text"] = self.isso.render(c["text"])
-        return JSON(rv, 200)
+        return JSON({"comments":comments}, 200)
