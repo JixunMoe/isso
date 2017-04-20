@@ -235,7 +235,8 @@ class Comments:
                'INNER JOIN threads ON comments.tid = threads.id',
                'ORDER BY comments.id DESC LIMIT ?']
 
-        return dict(self.db.execute(sql, [count]).fetchall())
+        rv = self.db.execute(sql, [count]).fetchall()
+		return [dict(zip(['uri', 'author', 'website', 'text'], c)) for c in rv]
 
     def purge(self, delta):
         """
