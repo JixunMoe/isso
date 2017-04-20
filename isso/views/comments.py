@@ -491,6 +491,6 @@ class API(object):
 
     def demo(self, env, req):
         return redirect(get_current_url(env) + '/index.html')
-	
-	def latest(self, env, req)
+    
+    def latest(self, env, req):
         return JSON(self.comments.latest(5), 200)
