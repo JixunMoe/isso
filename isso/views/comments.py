@@ -90,6 +90,7 @@ class API(object):
         ('like',    ('POST', '/id/<int:id>/like')),
         ('dislike', ('POST', '/id/<int:id>/dislike')),
         ('demo',    ('GET', '/demo')),
+        ('latest'   ('GET', '/latest')),
         ('preview', ('POST', '/preview'))
     ]
 
@@ -490,3 +491,6 @@ class API(object):
 
     def demo(self, env, req):
         return redirect(get_current_url(env) + '/index.html')
+	
+	def latest(self, env, req)
+        return JSON(self.comments.latest(5), 200)
