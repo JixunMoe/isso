@@ -236,7 +236,7 @@ class Comments:
                'ORDER BY comments.id DESC LIMIT ?']
 
         rv = self.db.execute(sql, [count]).fetchall()
-		return [dict(zip(['uri', 'author', 'website', 'text'], c)) for c in rv]
+        return [dict(zip(['uri', 'author', 'website', 'text'], c)) for c in rv]
 
     def purge(self, delta):
         """
